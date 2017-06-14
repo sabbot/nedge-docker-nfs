@@ -360,6 +360,6 @@ func (d NdnfsDriver) ListVolumes() (vmap map[string]string, err error) {
 	return vmap, err
 }
 
-func isPowerOfTwo(x int64) (res bool) {
+func isPowerOfTwo(x int) (res bool) {
 	return (x != 0) && ((x & (x - 1)) == 0)
 }
