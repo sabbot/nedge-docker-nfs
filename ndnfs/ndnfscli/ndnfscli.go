@@ -3,7 +3,7 @@ package ndnfscli
 import (
 	"fmt"
 	"github.com/urfave/cli"
-	"github.com/nexenta/nedge-docker-nfs/ndnfs/driver"
+	"github.com/qeas/nedge-docker-nfs/ndnfs/driver"
 	"github.com/docker/go-plugins-helpers/volume"
 	log "github.com/Sirupsen/logrus"
 	"path/filepath"
