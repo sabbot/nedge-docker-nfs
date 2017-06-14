@@ -244,7 +244,6 @@ func (d NdnfsDriver) Mount(r volume.MountRequest) volume.Response {
 	log.Info(DN, "Mount volume: ", r.Name)
 	d.Mutex.Lock()
 	defer d.Mutex.Unlock()
-	var err error
 	var mnt string
 
 	nfs := fmt.Sprintf("%s:/%s", d.Config.Nedgedata, r.Name)
