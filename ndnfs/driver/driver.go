@@ -218,8 +218,7 @@ func (d NdnfsDriver) Get(r volume.GetRequest) (*volume.GetResponse, error) {
 	}
 
 	log.Debug("Device mountpoint is: ", mnt)
-	return (&volume.GetResponse{Volume: &volume.Volume{
-			Name: r.Name, Mountpoint: mnt}}, err)
+	return &volume.GetResponse{Volume: &volume.Volume{Name: r.Name, Mountpoint: mnt}}, err
 }
 
 func (d NdnfsDriver) List() (*volume.ListResponse, error) {
