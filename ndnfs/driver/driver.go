@@ -131,7 +131,7 @@ func (d NdnfsDriver) Capabilities() *volume.CapabilitiesResponse {
 	return &volume.CapabilitiesResponse{Capabilities: volume.Capability{Scope: d.Scope}}
 }
 
-func (d NdnfsDriver) Create(r *volume.CreateRequest) err error {
+func (d NdnfsDriver) Create(r *volume.CreateRequest) (err error) {
 	log.Debugf(fmt.Sprintf("Create volume %s using %s with options: %s", r.Name, DN, r.Options))
 	d.Mutex.Lock()
 	defer d.Mutex.Unlock()
