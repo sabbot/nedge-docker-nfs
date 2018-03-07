@@ -126,12 +126,12 @@ func (d *NdnfsDriver) checkError(resp *http.Response) (err error) {
 	return err
 }
 
-func (d NdnfsDriver) Capabilities(r volume.Request) volume.Response {
+func (d NdnfsDriver) Capabilities() volume.CapabilitiesResponse {
 	log.Debug(DN, "Received Capabilities req")
-	return volume.Response{Capabilities: volume.Capability{Scope: d.Scope}}
+	return volume.CapabilitiesResponse{Capabilities: volume.Capability{Scope: d.Scope}}
 }
 
-func (d NdnfsDriver) Create(r volume.Request) volume.Response {
+func (d NdnfsDriver) Create(r volume.CreateRequest) {
 	log.Debugf(fmt.Sprintf("Create volume %s using %s with options: %s", r.Name, DN, r.Options))
 	d.Mutex.Lock()
 	defer d.Mutex.Unlock()
@@ -147,8 +147,7 @@ func (d NdnfsDriver) Create(r volume.Request) volume.Response {
 
 	if chunkSizeInt < 4096 || chunkSizeInt > 1048576 || !(isPowerOfTwo(chunkSizeInt)) {
 		err = errors.New("Chunksize must be in range of 4096 - 1048576 and be a power of 2")
-		log.Error(err)
-		return volume.Response{Err: err.Error()}
+		log.Panic(err)
 	}
 	
 	data := make(map[string]interface{})
@@ -178,7 +177,7 @@ func (d NdnfsDriver) Create(r volume.Request) volume.Response {
 	}
 	if (resp["code"] != nil) && (resp["code"] != "RT_ERR_EXISTS") {
 		err = errors.New(fmt.Sprintf("Error while handling request: %s", resp))
-		return volume.Response{Err: err.Error()}
+		log.Panic(err)
 	}
 
 	data = make(map[string]interface{})
@@ -193,19 +192,17 @@ func (d NdnfsDriver) Create(r volume.Request) volume.Response {
 	}
 	if resp["code"] == "EINVAL" {
 		err = errors.New(fmt.Sprintf("Error while handling request: %s", resp))
-		return volume.Response{Err: err.Error()}
+		log.Panic(err)
 	}
-
-	return volume.Response{}
 }
 
-func (d NdnfsDriver) Get(r volume.Request) volume.Response {
+func (d NdnfsDriver) Get(r volume.GetRequest) volume.GetResponse {
 	log.Debug(DN, "Get volume: ", r.Name, " Options: ", r.Options)
 	var mnt string
 	nfsMap, err := d.ListVolumes()
 	if err != nil {
 		log.Info("Volume with name ", r.Name, " not found")
-		return volume.Response{}
+		return volume.GetResponse{}
 	}
 
 	for k, v := range nfsMap {
@@ -215,32 +212,31 @@ func (d NdnfsDriver) Get(r volume.Request) volume.Response {
 		}
 	}
 	if mnt == "" {
-		return volume.Response{}
+		return volume.GetResponse{}
 	}
 
 	log.Debug("Device mountpoint is: ", mnt)
-	return volume.Response{Volume: &volume.Volume{
+	return volume.GetResponse{Volume: &volume.Volume{
 		Name: r.Name, Mountpoint: mnt}}
 }
 
-func (d NdnfsDriver) List(r volume.Request) volume.Response {
+func (d NdnfsDriver) List() volume.ListResponse {
 	log.Debug(DN, "List volume")
 	vmap, err := d.ListVolumes()
+	var vols []*volume.Volume
 	if err != nil {
-		log.Info("Failed to retrieve volume list", err)
-		return volume.Response{Err: err.Error()}
+		log.Panic("Failed to retrieve volume list", err)
 	}
 	log.Debug(DN, "Nedge response: ", vmap)
-	var vols []*volume.Volume
 	for name, mnt := range vmap {
 		if name != "" {
 			vols = append(vols, &volume.Volume{Name: name, Mountpoint: mnt})
 		}
 	}
-	return volume.Response{Volumes: vols}
+	return volume.ListResponse{Volumes: vols}
 }
 
-func (d NdnfsDriver) Mount(r volume.MountRequest) volume.Response {
+func (d NdnfsDriver) Mount(r volume.MountRequest) volume.MountResponse {
 	log.Info(DN, "Mount volume: ", r.Name)
 	d.Mutex.Lock()
 	defer d.Mutex.Unlock()
@@ -255,20 +251,19 @@ func (d NdnfsDriver) Mount(r volume.MountRequest) volume.Response {
 	log.Debug(DN, "Mounting Volume ", r.Name)
 	args := []string{"-t", "nfs", nfs, mnt}
 	if out, err := exec.Command("mount", args...).CombinedOutput(); err != nil {
-		log.Error("Error running mount command: ", err, "{", string(out), "}")
 		err = errors.New(fmt.Sprintf("%s: %s", err, out))
-		return volume.Response{Err: err.Error()}
+		log.Panic("Error running mount command: ", err, "{", string(out), "}")
 	}
-	return volume.Response{Mountpoint: mnt}
+	return volume.MountResponse{Mountpoint: mnt}
 }
 
-func (d NdnfsDriver) Path(r volume.Request) volume.Response {
-	log.Info(DN, "Path volume: ", r.Name, " Options: ", r.Options)
+func (d NdnfsDriver) Path(r volume.PathRequest) volume.PathResponse {
+	log.Info(DN, "Path volume: ", r.Name)
 	mnt := fmt.Sprintf("%s%s", d.Config.Mountpoint, r.Name)
-	return volume.Response{Mountpoint: mnt}
+	return volume.PathResponse{Mountpoint: mnt}
 }
 
-func (d NdnfsDriver) Remove(r volume.Request) volume.Response {
+func (d NdnfsDriver) Remove(r volume.RemoveRequest) {
 	log.Info(DN, "Remove volume: ", r.Name, " Options: ", r.Options)
 	d.Mutex.Lock()
 	defer d.Mutex.Unlock()
@@ -283,7 +278,7 @@ func (d NdnfsDriver) Remove(r volume.Request) volume.Response {
 		}
 	}
 	if path == "" {
-		return volume.Response{}
+		return
 	}
 	if os.Getenv("CCOW_SVCNAME") != "" {
 		service = os.Getenv("CCOW_SVCNAME")
@@ -307,10 +302,10 @@ func (d NdnfsDriver) Remove(r volume.Request) volume.Response {
 		log.Info("Error running rm command: ", err, "{", string(out), "}")
 	}
 
-	return volume.Response{}
+	return
 }
 
-func (d NdnfsDriver) Unmount(r volume.UnmountRequest) volume.Response {
+func (d NdnfsDriver) Unmount(r volume.UnmountRequest) {
 	log.Info(DN, "Unmount volume: ", r.Name)
 	d.Mutex.Lock()
 	defer d.Mutex.Unlock()
@@ -318,7 +313,7 @@ func (d NdnfsDriver) Unmount(r volume.UnmountRequest) volume.Response {
 	if out, err := exec.Command("umount", nfs).CombinedOutput(); err != nil {
 		log.Error("Error running umount command: ", err, "{", string(out), "}")
 	}
-	return volume.Response{}
+	return
 }
 
 func (d NdnfsDriver) GetNfsList() (nfsList []string, err error) {
