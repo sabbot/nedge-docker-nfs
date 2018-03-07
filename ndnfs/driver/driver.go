@@ -131,7 +131,7 @@ func (d NdnfsDriver) Capabilities() *volume.CapabilitiesResponse {
 	return &volume.CapabilitiesResponse{Capabilities: volume.Capability{Scope: d.Scope}}
 }
 
-func (d NdnfsDriver) Create(r *volume.CreateRequest) {
+func (d NdnfsDriver) Create(r *volume.CreateRequest) error {
 	log.Debugf(fmt.Sprintf("Create volume %s using %s with options: %s", r.Name, DN, r.Options))
 	d.Mutex.Lock()
 	defer d.Mutex.Unlock()
@@ -147,7 +147,7 @@ func (d NdnfsDriver) Create(r *volume.CreateRequest) {
 
 	if chunkSizeInt < 4096 || chunkSizeInt > 1048576 || !(isPowerOfTwo(chunkSizeInt)) {
 		err = errors.New("Chunksize must be in range of 4096 - 1048576 and be a power of 2")
-		log.Panic(err)
+		return err
 	}
 	
 	data := make(map[string]interface{})
@@ -174,10 +174,11 @@ func (d NdnfsDriver) Create(r *volume.CreateRequest) {
 	jsonerr := json.Unmarshal(body, &resp)
 	if (jsonerr != nil) {
 		log.Error(jsonerr)
+		return err
 	}
 	if (resp["code"] != nil) && (resp["code"] != "RT_ERR_EXISTS") {
 		err = errors.New(fmt.Sprintf("Error while handling request: %s", resp))
-		log.Panic(err)
+		return err
 	}
 
 	data = make(map[string]interface{})
@@ -189,10 +190,11 @@ func (d NdnfsDriver) Create(r *volume.CreateRequest) {
 	jsonerr = json.Unmarshal(body, &resp)
 	if (jsonerr != nil) {
 		log.Error(jsonerr)
+		return err
 	}
 	if resp["code"] == "EINVAL" {
 		err = errors.New(fmt.Sprintf("Error while handling request: %s", resp))
-		log.Panic(err)
+		return err
 	}
 }
 
