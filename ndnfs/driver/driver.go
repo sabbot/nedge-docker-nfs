@@ -237,7 +237,7 @@ func (d NdnfsDriver) List() (*volume.ListResponse, error) {
 	return &volume.ListResponse{Volumes: vols}, err
 }
 
-func (d NdnfsDriver) Mount(r v*olume.MountRequest) (*volume.MountResponse, error) {
+func (d NdnfsDriver) Mount(r *volume.MountRequest) (*volume.MountResponse, error) {
 	log.Info(DN, "Mount volume: ", r.Name)
 	d.Mutex.Lock()
 	defer d.Mutex.Unlock()
