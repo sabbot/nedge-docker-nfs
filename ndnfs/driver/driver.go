@@ -198,7 +198,7 @@ func (d NdnfsDriver) Create(r *volume.CreateRequest) (err error) {
 	return err
 }
 
-func (d NdnfsDriver) Get(r volume.GetRequest) (*volume.GetResponse, err error) {
+func (d NdnfsDriver) Get(r volume.GetRequest) (*volume.GetResponse, error) {
 	log.Debug(DN, "Get volume: ", r.Name)
 	var mnt string
 	nfsMap, err := d.ListVolumes()
@@ -214,7 +214,7 @@ func (d NdnfsDriver) Get(r volume.GetRequest) (*volume.GetResponse, err error) {
 		}
 	}
 	if mnt == "" {
-		return &volume.GetResponse{}
+		return &volume.GetResponse{}, err
 	}
 
 	log.Debug("Device mountpoint is: ", mnt)
@@ -222,7 +222,7 @@ func (d NdnfsDriver) Get(r volume.GetRequest) (*volume.GetResponse, err error) {
 			Name: r.Name, Mountpoint: mnt}}, err)
 }
 
-func (d NdnfsDriver) List() (*volume.ListResponse, err error) {
+func (d NdnfsDriver) List() (*volume.ListResponse, error) {
 	log.Debug(DN, "List volume")
 	vmap, err := d.ListVolumes()
 	var vols []*volume.Volume
@@ -238,7 +238,7 @@ func (d NdnfsDriver) List() (*volume.ListResponse, err error) {
 	return (&volume.ListResponse{Volumes: vols}, err)
 }
 
-func (d NdnfsDriver) Mount(r volume.MountRequest) (*volume.MountResponse, err error) {
+func (d NdnfsDriver) Mount(r volume.MountRequest) (*volume.MountResponse, error) {
 	log.Info(DN, "Mount volume: ", r.Name)
 	d.Mutex.Lock()
 	defer d.Mutex.Unlock()
@@ -259,13 +259,13 @@ func (d NdnfsDriver) Mount(r volume.MountRequest) (*volume.MountResponse, err er
 	return (&volume.MountResponse{Mountpoint: mnt}, err)
 }
 
-func (d NdnfsDriver) Path(r volume.PathRequest) (*volume.PathResponse, err error) {
+func (d NdnfsDriver) Path(r volume.PathRequest) (*volume.PathResponse, error) {
 	log.Info(DN, "Path volume: ", r.Name)
 	mnt := fmt.Sprintf("%s%s", d.Config.Mountpoint, r.Name)
-	return (&volume.PathResponse{Mountpoint: mnt}, err)
+	return (&volume.PathResponse{Mountpoint: mnt}, errors.New())
 }
 
-func (d NdnfsDriver) Remove(r volume.RemoveRequest) (err error) {
+func (d NdnfsDriver) Remove(r volume.RemoveRequest) error {
 	log.Info(DN, "Remove volume: ", r.Name)
 	d.Mutex.Lock()
 	defer d.Mutex.Unlock()
