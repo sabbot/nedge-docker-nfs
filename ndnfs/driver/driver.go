@@ -126,9 +126,9 @@ func (d *NdnfsDriver) checkError(resp *http.Response) (err error) {
 	return err
 }
 
-func (d NdnfsDriver) Capabilities() volume.CapabilitiesResponse {
+func (d NdnfsDriver) Capabilities() *volume.CapabilitiesResponse {
 	log.Debug(DN, "Received Capabilities req")
-	return volume.CapabilitiesResponse{Capabilities: volume.Capability{Scope: d.Scope}}
+	return &volume.CapabilitiesResponse{Capabilities: volume.Capability{Scope: d.Scope}}
 }
 
 func (d NdnfsDriver) Create(r volume.CreateRequest) {
