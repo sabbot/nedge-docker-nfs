@@ -85,7 +85,7 @@ func Start(cfgFile string, debug bool) {
 	if out, err := exec.Command("mkdir", "-p", defaultDir).CombinedOutput(); err != nil {
 	    log.Error("Error running mkdir command: ", err, "{", string(out), "}")
 	}
-	log.Info("Out: ", out "Err: ", err)
+	log.Info("Out: ", out, "Err: ", err)
 	log.Info("Default docker root ndnfs: ", defaultDir)
 	d := driver.DriverAlloc(cfgFile)
 	h := volume.NewHandler(d)
