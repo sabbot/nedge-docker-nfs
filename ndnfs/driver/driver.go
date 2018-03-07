@@ -234,7 +234,7 @@ func (d NdnfsDriver) List() (*volume.ListResponse, error) {
 			vols = append(vols, &volume.Volume{Name: name, Mountpoint: mnt})
 		}
 	}
-	return (&volume.ListResponse{Volumes: vols}, err)
+	return &volume.ListResponse{Volumes: vols}, err
 }
 
 func (d NdnfsDriver) Mount(r volume.MountRequest) (*volume.MountResponse, error) {
@@ -255,13 +255,13 @@ func (d NdnfsDriver) Mount(r volume.MountRequest) (*volume.MountResponse, error)
 		err = errors.New(fmt.Sprintf("%s: %s", err, out))
 		log.Panic("Error running mount command: ", err, "{", string(out), "}")
 	}
-	return (&volume.MountResponse{Mountpoint: mnt}, err)
+	return &volume.MountResponse{Mountpoint: mnt}, err
 }
 
 func (d NdnfsDriver) Path(r volume.PathRequest) (*volume.PathResponse, error) {
 	log.Info(DN, "Path volume: ", r.Name)
 	mnt := fmt.Sprintf("%s%s", d.Config.Mountpoint, r.Name)
-	return (&volume.PathResponse{Mountpoint: mnt}, errors.New())
+	return &volume.PathResponse{Mountpoint: mnt}, errors.New()
 }
 
 func (d NdnfsDriver) Remove(r volume.RemoveRequest) error {
