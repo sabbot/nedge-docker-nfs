@@ -261,8 +261,9 @@ func (d NdnfsDriver) Mount(r volume.MountRequest) (*volume.MountResponse, error)
 
 func (d NdnfsDriver) Path(r volume.PathRequest) (*volume.PathResponse, error) {
 	log.Info(DN, "Path volume: ", r.Name)
+	var err error
 	mnt := fmt.Sprintf("%s%s", d.Config.Mountpoint, r.Name)
-	return &volume.PathResponse{Mountpoint: mnt}, error
+	return &volume.PathResponse{Mountpoint: mnt}, err
 }
 
 func (d NdnfsDriver) Remove(r volume.RemoveRequest) error {
