@@ -2,6 +2,7 @@ package ndnfscli
 
 import (
 	"fmt"
+	"os/exec"
 	"github.com/urfave/cli"
 	"github.com/qeas/nedge-docker-nfs/ndnfs/driver"
 	"github.com/docker/go-plugins-helpers/volume"
@@ -80,6 +81,9 @@ func Start(cfgFile string, debug bool) {
 		log.SetLevel(log.DebugLevel)
 	} else {
 		log.SetLevel(log.InfoLevel)
+	}
+	if out, err := exec.Command("mkdir", "-p", defaultDir).CombinedOutput(); err != nil {
+	    log.Error("Error running mkdir command: ", err, "{", string(out), "}")
 	}
 	log.Info("Default docker root ndnfs: ", defaultDir)
 	d := driver.DriverAlloc(cfgFile)
