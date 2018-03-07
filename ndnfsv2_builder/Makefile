@@ -6,6 +6,8 @@ all: clean docker rootfs create enable clean
 
 
 clean:
+	@echo "### docker rm -f tmp"
+	@docker rm -f tmp || true
 	@echo "### rm ./plugin"
 	@rm -rf ./plugin
 	@echo "### rm ./ndnfs"

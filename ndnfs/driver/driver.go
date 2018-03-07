@@ -198,7 +198,7 @@ func (d NdnfsDriver) Create(r *volume.CreateRequest) (err error) {
 	return err
 }
 
-func (d NdnfsDriver) Get(r volume.GetRequest) (*volume.GetResponse, error) {
+func (d NdnfsDriver) Get(r *volume.GetRequest) (*volume.GetResponse, error) {
 	log.Debug(DN, "Get volume: ", r.Name)
 	var mnt string
 	nfsMap, err := d.ListVolumes()
@@ -237,7 +237,7 @@ func (d NdnfsDriver) List() (*volume.ListResponse, error) {
 	return &volume.ListResponse{Volumes: vols}, err
 }
 
-func (d NdnfsDriver) Mount(r volume.MountRequest) (*volume.MountResponse, error) {
+func (d NdnfsDriver) Mount(r v*olume.MountRequest) (*volume.MountResponse, error) {
 	log.Info(DN, "Mount volume: ", r.Name)
 	d.Mutex.Lock()
 	defer d.Mutex.Unlock()
@@ -259,14 +259,14 @@ func (d NdnfsDriver) Mount(r volume.MountRequest) (*volume.MountResponse, error)
 	return &volume.MountResponse{Mountpoint: mnt}, err
 }
 
-func (d NdnfsDriver) Path(r volume.PathRequest) (*volume.PathResponse, error) {
+func (d NdnfsDriver) Path(r *volume.PathRequest) (*volume.PathResponse, error) {
 	log.Info(DN, "Path volume: ", r.Name)
 	var err error
 	mnt := fmt.Sprintf("%s%s", d.Config.Mountpoint, r.Name)
 	return &volume.PathResponse{Mountpoint: mnt}, err
 }
 
-func (d NdnfsDriver) Remove(r volume.RemoveRequest) error {
+func (d NdnfsDriver) Remove(r *volume.RemoveRequest) error {
 	log.Info(DN, "Remove volume: ", r.Name)
 	d.Mutex.Lock()
 	defer d.Mutex.Unlock()
@@ -309,7 +309,7 @@ func (d NdnfsDriver) Remove(r volume.RemoveRequest) error {
 	return err
 }
 
-func (d NdnfsDriver) Unmount(r volume.UnmountRequest) (err error) {
+func (d NdnfsDriver) Unmount(r *volume.UnmountRequest) (err error) {
 	log.Info(DN, "Unmount volume: ", r.Name)
 	d.Mutex.Lock()
 	defer d.Mutex.Unlock()
