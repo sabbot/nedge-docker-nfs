@@ -196,6 +196,7 @@ func (d NdnfsDriver) Create(r *volume.CreateRequest) error {
 		err = errors.New(fmt.Sprintf("Error while handling request: %s", resp))
 		return err
 	}
+	return
 }
 
 func (d NdnfsDriver) Get(r volume.GetRequest) *volume.GetResponse {
