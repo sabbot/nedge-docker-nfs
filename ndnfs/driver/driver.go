@@ -79,8 +79,9 @@ func DriverAlloc(cfgFile string) NdnfsDriver {
 }
 
 func (d *NdnfsDriver) Request(method, endpoint string, data map[string]interface{}) (body []byte, err error) {
+	url := d.Endpoint + endpoint
 	log.Debug("Issuing request to NexentaEdge, endpoint: ",
-		fmt.Sprintf("%s:%s/%s", d.Config.Nedgerest, d.Config.Nedgeport, endpoint), " data: ", data, " method: ", method)
+		fmt.Sprintf("%s/%s", url, endpoint), " data: ", data, " method: ", method)
 	if endpoint == "" {
 		err = errors.New("Unable to issue requests without specifying Endpoint")
 		log.Fatal(err.Error())
@@ -92,7 +93,6 @@ func (d *NdnfsDriver) Request(method, endpoint string, data map[string]interface
 
 	tr := &http.Transport{}
 	client := &http.Client{Transport: tr}
-	url := d.Endpoint + endpoint
 	req, err := http.NewRequest(method, url, nil)
 	if len(data) != 0 {
 		req, err = http.NewRequest(method, url, strings.NewReader(string(datajson)))
