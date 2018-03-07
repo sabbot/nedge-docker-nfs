@@ -254,7 +254,7 @@ func (d NdnfsDriver) Mount(r volume.MountRequest) *volume.MountResponse {
 		err = errors.New(fmt.Sprintf("%s: %s", err, out))
 		log.Panic("Error running mount command: ", err, "{", string(out), "}")
 	}
-	return volume.&MountResponse{Mountpoint: mnt}
+	return &volume.MountResponse{Mountpoint: mnt}
 }
 
 func (d NdnfsDriver) Path(r volume.PathRequest) *volume.PathResponse {
