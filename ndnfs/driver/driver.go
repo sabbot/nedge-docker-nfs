@@ -197,7 +197,7 @@ func (d NdnfsDriver) Create(r volume.CreateRequest) {
 }
 
 func (d NdnfsDriver) Get(r volume.GetRequest) volume.GetResponse {
-	log.Debug(DN, "Get volume: ", r.Name, " Options: ", r.Options)
+	log.Debug(DN, "Get volume: ", r.Name)
 	var mnt string
 	nfsMap, err := d.ListVolumes()
 	if err != nil {
@@ -264,7 +264,7 @@ func (d NdnfsDriver) Path(r volume.PathRequest) volume.PathResponse {
 }
 
 func (d NdnfsDriver) Remove(r volume.RemoveRequest) {
-	log.Info(DN, "Remove volume: ", r.Name, " Options: ", r.Options)
+	log.Info(DN, "Remove volume: ", r.Name)
 	d.Mutex.Lock()
 	defer d.Mutex.Unlock()
 	nfsList, err := d.GetNfsList()
