@@ -12,7 +12,7 @@ import (
 
 const socketAddress = "/run/docker/plugins/ndnfs.sock"
 
-var	defaultDir = filepath.Join(volume.DefaultDockerRootDirectory, "ndnfs")
+var	defaultDir = filepath.Join("/var/lib/docker/volumes/", "ndnfs")
 
 func NdnfsCmdNotFound(c *cli.Context, command string) {
 	fmt.Println(command, " not found.");
@@ -82,10 +82,6 @@ func Start(cfgFile string, debug bool) {
 	} else {
 		log.SetLevel(log.InfoLevel)
 	}
-	if out, err := exec.Command("mkdir", "-p", defaultDir).CombinedOutput(); err != nil {
-	    log.Error("Error running mkdir command: ", err, "{", string(out), "}")
-	}
-	log.Info("New SHIT: ", defaultDir)
 	log.Info("Default docker root ndnfs: ", defaultDir)
 	d := driver.DriverAlloc(cfgFile)
 	h := volume.NewHandler(d)
