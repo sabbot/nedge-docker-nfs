@@ -242,6 +242,7 @@ func (d NdnfsDriver) Mount(r volume.MountRequest) (*volume.MountResponse, error)
 	d.Mutex.Lock()
 	defer d.Mutex.Unlock()
 	var mnt string
+	var err error
 
 	nfs := fmt.Sprintf("%s:/%s", d.Config.Nedgedata, r.Name)
 	mnt = filepath.Join(d.Config.Mountpoint, r.Name)
@@ -261,7 +262,7 @@ func (d NdnfsDriver) Mount(r volume.MountRequest) (*volume.MountResponse, error)
 func (d NdnfsDriver) Path(r volume.PathRequest) (*volume.PathResponse, error) {
 	log.Info(DN, "Path volume: ", r.Name)
 	mnt := fmt.Sprintf("%s%s", d.Config.Mountpoint, r.Name)
-	return &volume.PathResponse{Mountpoint: mnt}, errors.New()
+	return &volume.PathResponse{Mountpoint: mnt}, error
 }
 
 func (d NdnfsDriver) Remove(r volume.RemoveRequest) error {
